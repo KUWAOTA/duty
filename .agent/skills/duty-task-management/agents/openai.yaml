@@ -1,0 +1,4 @@
+version: 1
+display_name: Duty Task Management
+short_description: Manage daily tasks in the duty Obsidian vault.
+default_prompt: Update the duty vault task board and tell me what to do next.
