@@ -1,6 +1,6 @@
 ---
 title: eufyのエアタグ風トラッカーをセットアップする
-status: active
+status: needs_review
 priority: high
 due: 2026-03-11
 estimate: 25m

@@ -28,6 +28,7 @@ class Task:
     project: str
     next_action: str
     open_steps: int
+    next_review: str = ""
 
 
 def parse_frontmatter(text: str) -> tuple[dict[str, str], str]:
@@ -90,18 +91,27 @@ def load_tasks() -> list[Task]:
                 project=project,
                 next_action=next_action,
                 open_steps=open_steps,
+                next_review=frontmatter.get("next_review", ""),
             )
         )
     return tasks
 
 
-def task_sort_key(task: Task) -> tuple[int, str, str]:
+def task_sort_key(task: Task) -> tuple[str, int, str]:
     priority_rank = PRIORITY_ORDER.get(task.priority, 9)
     due_rank = task.due if task.due != "-" else "9999-12-31"
-    return priority_rank, due_rank, task.title
+    return due_rank, priority_rank, task.title
+
+
+def actionable(tasks: list[Task]) -> list[Task]:
+    today = date.today().isoformat()
+    return [t for t in tasks if t.status == "active" and
+            (not t.next_review or t.next_review <= today or
+             (t.due != "-" and t.due <= today))]
 
 
 def format_board(tasks: list[Task]) -> str:
+    ready = actionable(tasks)
     today = date.today().isoformat()
     lines = [
         "# Task Board",
@@ -112,16 +122,16 @@ def format_board(tasks: list[Task]) -> str:
         "",
     ]
 
-    if not tasks:
+    if not ready:
         lines.append("- アクティブなタスクはありません")
     else:
-        for index, task in enumerate(tasks[:5], start=1):
+        for index, task in enumerate(ready[:5], start=1):
             lines.append(
                 f"{index}. {task.title} | 優先度: {task.priority} | 期限: {task.due} | "
                 f"工数: {task.estimate} | 次の一歩: {task.next_action}"
             )
 
-    lines.extend(["", "## アクティブ一覧", ""])
+    lines.extend(["", "## 全タスク（確認待ち・次回確認待ちを含む）", ""])
 
     if not tasks:
         lines.append("- なし")
@@ -131,13 +141,14 @@ def format_board(tasks: list[Task]) -> str:
             lines.append(
                 f"- {task.title} | 状態: {task.status} | 優先度: {task.priority} | "
                 f"期限: {task.due} | 工数: {task.estimate} | 未完了手順: {task.open_steps} | "
-                f"プロジェクト: {task.project} | ノート: [[{rel_path[:-3]}]]"
+                f"次回確認: {task.next_review or '-'} | プロジェクト: {task.project} | ノート: [{task.title}](../{rel_path})"
             )
 
     return "\n".join(lines) + "\n"
 
 
 def format_prompt(tasks: list[Task]) -> str:
+    tasks = actionable(tasks)
     if not tasks:
         return "今日の未処理タスクはありません。必要なら新しいタスクを追加してください。\n"
 

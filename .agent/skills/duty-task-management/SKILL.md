@@ -26,11 +26,14 @@ Use the local `taskManagement` directory as the single task system for this vaul
 
 - Treat `status: active` as actionable.
 - Treat `status: waiting` as blocked but still visible.
+- Treat `status: needs_review` as historical work awaiting a current progress report; do not recommend execution until confirmed.
+- For recurring checks use `repeat_days` and ISO `next_review`. Advance next_review only after a reported check, capped at due. Do not mark the task done after just one check.
+- Rebuild the board whenever asked what to do, so future checks become actionable on their scheduled date. Sort actionable tasks by deadline, then priority.
 - Treat `status: done` and `status: cancelled` as closed.
 - Use the first unchecked checklist item as the next action whenever possible.
 - Do not hand-edit `taskManagement/outputs/board.md` or `taskManagement/outputs/next_prompt.txt`; regenerate them.
 
 ## Response Pattern
 
-When asked what to do now, answer from `taskManagement/outputs/board.md` first.
+When asked what to do now, regenerate and answer from `taskManagement/outputs/board.md` first. Follow the Japanese Markdown-file response rules in the root `AGENTS.md`.
 When asked to add a task, create or update a note in `taskManagement/tasks/` and regenerate outputs.

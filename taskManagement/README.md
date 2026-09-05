@@ -1,5 +1,15 @@
 # Task Management
 
+## 会話での使い方
+
+「次なにやればいい？」でボードを再生成し、実行可能な用事を期限順・優先度順に案内します。新しい用事や進捗は会話から各タスクに反映します。
+
+旧 `task/` の `tasks`・`master`・`daily`・`input`・`output`・`prompt` はここへ統合しました。`output/` は既存資料、`outputs/` は自動生成ボードです。
+
+`needs_review` は過去の記録の現状確認待ち、`waiting` は外部待ちです。完了と推定せず、現在実行する候補からは外しています。旧週間予定は `master/schedule.md` に保存しています。
+
+原付探しは2026-10-09期限、暫定3日おき。`next_review` 当日以降に候補へ戻ります。確認報告時にログを残し、報告日＋`repeat_days` と期限の早い方へ次回日を更新します。自動通知は設定していません。
+
 This vault uses `taskManagement/` as the daily task system.
 
 ## Structure
